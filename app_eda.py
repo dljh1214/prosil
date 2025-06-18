@@ -246,11 +246,7 @@ class PopulationEDA:
             ax.set_ylabel("Population")
             st.pyplot(fig)
 
-            st.markdown(
-                "> **해설:** 전체 인구는 시간이 지남에 따라 꾸준히 증가하는 추세를 보이며"
-                "> 2035년 예측선을 통해 미래 인구 추정을 시각적으로 비교할 수 있습니다."
-                "> 최근 출생자 수 감소와 사망자 수 증가 추세를 반영하면 인구 증가세가 둔화될 수 있음을 나타냅니다."
-            )
+            
 
         with tabs[2]:
             st.subheader("📊 지역별 최근 5년 인구 변화량")
