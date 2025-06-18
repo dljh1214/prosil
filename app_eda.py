@@ -296,18 +296,11 @@ class PopulationEDA:
             pivot = df.pivot(index='연도', columns='영문지역', values='인구').fillna(0)
             pivot = pivot.drop(columns='National', errors='ignore')
 
-            pivot_sorted = pivot[pivot.iloc[-1].sort_values(ascending=False).index]  # 마지막 연도 기준으로 정렬
-            cumulative = pivot_sorted.cumsum(axis=1)
+            pivot_melted = pivot.reset_index().melt(id_vars='연도', var_name='지역', value_name='인구')
             fig, ax = plt.subplots(figsize=(12, 6))
-
-            # 색상 팔레트 지정
-            palette = sns.color_palette("tab20", n_colors=len(pivot_sorted.columns))
-
-            for i, region in enumerate(pivot_sorted.columns):
-                lower = cumulative.iloc[:, i - 1] if i > 0 else np.zeros_like(pivot_sorted.index)
-                ax.fill_between(pivot_sorted.index, lower, cumulative[region], label=region, color=palette[i], alpha=0.8)
-
-            ax.set_title("Population by Region (Stacked Area)")
+            sns.lineplot(data=pivot_melted, x='연도', y='인구', hue='지역', lw=2, ax=ax)
+            ax.fill_between(pivot_melted['연도'], 0, 0, color='white', alpha=0.0)  # area trigger
+            ax.set_title("Population by Region")
             ax.set_xlabel("Year")
             ax.set_ylabel("Population")
             ax.legend(loc='upper left', bbox_to_anchor=(1.01, 1), title="Region")
