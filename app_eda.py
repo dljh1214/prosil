@@ -49,18 +49,18 @@ class Home:
         # Kaggle 데이터셋 출처 및 소개
         st.markdown("""
                 ---
-                **Bike Sharing Demand 데이터셋**  
-                - 제공처: [Kaggle Bike Sharing Demand Competition](https://www.kaggle.com/c/bike-sharing-demand)  
-                - 설명: 2011–2012년 캘리포니아 주의 수도인 미국 워싱턴 D.C. 인근 도시에서 시간별 자전거 대여량을 기록한 데이터  
-                - 주요 변수:  
-                  - `datetime`: 날짜 및 시간  
-                  - `season`: 계절  
-                  - `holiday`: 공휴일 여부  
-                  - `workingday`: 근무일 여부  
-                  - `weather`: 날씨 상태  
-                  - `temp`, `atemp`: 기온 및 체감온도  
-                  - `humidity`, `windspeed`: 습도 및 풍속  
-                  - `casual`, `registered`, `count`: 비등록·등록·전체 대여 횟수  
+                ### **Regional Population Trends 데이터셋**  
+                - **제공처**: 대한민국 통계청 기반 공개 인구 통계 데이터  
+                - **설명**:  
+                전국 및 각 시·도의 연도별 인구, 출생아수, 사망자수를 포함한 시계열 통계로,  
+                인구 구조의 변화 및 지역별 인구 흐름을 분석하는 데 활용됨  
+                - **주요 변수**:  
+                - `연도`: 기준 연도  
+                - `지역`: 지역명  
+                - `인구`: 총 인구 수  
+                - `출생아수(명)`: 출생자 수  
+                - `사망자수(명)`: 사망자 수  
+                
                 """)
 
 # ---------------------
@@ -297,7 +297,7 @@ Page_PopulationEDA = st.Page(PopulationEDA, title="인구 분석", icon="👥", 
 # 네비게이션 실행
 # ---------------------
 if st.session_state.logged_in:
-    pages = [Page_Home, Page_User, Page_Logout, Page_EDA, Page_PopulationEDA]
+    pages = [Page_Home, Page_User, Page_Logout, Page_PopulationEDA]
 else:
     pages = [Page_Home, Page_Login, Page_Register, Page_FindPW]
 
