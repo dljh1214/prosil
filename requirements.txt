@@ -4,4 +4,4 @@ numpy
 matplotlib
 seaborn
 pyrebase4
-pyrebase
+setuptools
