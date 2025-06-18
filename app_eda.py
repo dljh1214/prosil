@@ -234,6 +234,7 @@ class PopulationEDA:
         with tabs[1]:
             st.subheader("📈 연도별 전체 인구 추이")
             national_df = df[df['지역'] == '전국']
+            recent = national_df.tail(3)
             fig, ax = plt.subplots(figsize=(10, 4))
             sns.lineplot(x='연도', y='인구', data=national_df, marker='o', ax=ax)
             avg_delta = (recent['출생아수(명)'].mean() - recent['사망자수(명)'].mean())
