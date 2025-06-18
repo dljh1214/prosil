@@ -260,6 +260,7 @@ class PopulationEDA:
             ax1.bar_label(ax1.containers[0], fmt='%.0f')
             ax1.set_title("Population Change (Last 5 Years)")
             ax1.set_xlabel("Change (Thousands)")
+            ax1.set_ylabel("Region")
             st.pyplot(fig1)
             
 
@@ -267,6 +268,7 @@ class PopulationEDA:
             fig2, ax2 = plt.subplots()
             sns.barplot(x=rate.values, y=rate.index, ax=ax2)
             ax2.set_title("Population Growth Rate (%)")
+            ax2.set_ylabel("Region")
             st.pyplot(fig2)
 
         with tabs[3]:
