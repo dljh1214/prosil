@@ -261,6 +261,7 @@ class PopulationEDA:
             ax1.set_title("Population Change (Last 5 Years)")
             ax1.set_xlabel("Change (Thousands)")
             st.pyplot(fig1)
+            #
 
             rate = (pivot.loc[latest_year] / pivot.loc[latest_year - 4] - 1).drop("National") * 100
             fig2, ax2 = plt.subplots()
