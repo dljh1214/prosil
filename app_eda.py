@@ -234,18 +234,24 @@ class PopulationEDA:
         with tabs[1]:
             st.subheader("📈 연도별 전체 인구 추이")
             national_df = df[df['지역'] == '전국']
-            plt.figure(figsize=(10, 4))
-            sns.lineplot(x='연도', y='인구', data=national_df, marker='o')
-            plt.title("Population Trend")
-            plt.xlabel("Year")
-            plt.ylabel("Population")
-
-            recent = national_df.tail(3)
+            fig, ax = plt.subplots(figsize=(10, 4))
+            sns.lineplot(x='연도', y='인구', data=national_df, marker='o', ax=ax)
             avg_delta = (recent['출생아수(명)'].mean() - recent['사망자수(명)'].mean())
             pred_2035 = national_df.iloc[-1]['인구'] + avg_delta * (2035 - national_df['연도'].max())
-            plt.axhline(y=pred_2035, color='r', linestyle='--')
-            plt.text(2034, pred_2035, f"Predicted 2035: {int(pred_2035):,}", color='red')
-            st.pyplot(plt)
+            ax.axhline(y=pred_2035, color='r', linestyle='--')
+            ax.text(2034, pred_2035, f"Predicted 2035: {int(pred_2035):,}", color='red')
+            ax.set_title("Population Trend")
+            ax.set_xlabel("Year")
+            ax.set_ylabel("Population")
+            st.pyplot(fig)
+
+            st.markdown(
+                "> **해설:** 전체 인구는 시간이 지남에 따라 꾸준히 증가하는 추세를 보이며,
+"
+                "> 2035년 예측선을 통해 미래 인구 추정을 시각적으로 비교할 수 있습니다.
+"
+                "> 최근 출생자 수 감소와 사망자 수 증가 추세를 반영하면 인구 증가세가 둔화될 수 있음을 나타냅니다."
+            )
 
         with tabs[2]:
             st.subheader("📊 지역별 최근 5년 인구 변화량")
@@ -260,41 +266,48 @@ class PopulationEDA:
             ax1.bar_label(ax1.containers[0], fmt='%.0f')
             ax1.set_title("Population Change (Last 5 Years)")
             ax1.set_xlabel("Change (Thousands)")
-            ax1.set_ylabel("Region")
             st.pyplot(fig1)
-            
 
             rate = (pivot.loc[latest_year] / pivot.loc[latest_year - 4] - 1).drop("National") * 100
             fig2, ax2 = plt.subplots()
             sns.barplot(x=rate.values, y=rate.index, ax=ax2)
             ax2.set_title("Population Growth Rate (%)")
-            ax2.set_ylabel("Region")
             st.pyplot(fig2)
+
             st.markdown(
-                "> **해설:** 상위 지역들은 최근 5년간 유입 인구가 상대적으로 많거나, 지속적인 개발이 이뤄진 지역일 가능성이 높습니다.\n"
-                "> 반대로 하위 지역은 고령화나 인구 유출이 지속되었을 가능성이 있습니다.\n"
+                "> **해설:** 상위 지역들은 최근 5년간 유입 인구가 상대적으로 많거나, 지속적인 개발이 이뤄진 지역일 가능성이 높습니다.
+"
+                "> 반대로 하위 지역은 고령화나 인구 유출이 지속되었을 가능성이 있습니다.
+"
                 "> 변화율(%)을 함께 확인함으로써 단순 인구 변화량보다 더 명확한 성장/감소 흐름을 파악할 수 있습니다."
             )
-
 
         with tabs[3]:
             st.subheader("🔍 연도별 증감 상위 사례")
             df_no_total = df[df['지역'] != '전국']
             df_no_total['증감'] = df_no_total.groupby('지역')['인구'].diff()
-            top100 = df_no_total.sort_values(by='증감', ascending=False).head(100)
-            styled = top100.style.format({'증감': "{:,}"}).background_gradient(
-                subset=['증감'], cmap='RdBu_r', axis=0)
+            top100 = df_no_total.sort_values(by='증감', ascending=False).head(100).copy()
+            top100['증감'] = top100['증감'].astype(int)
+            top100['증감'] = top100['증감'].map(lambda x: f"{x:,}")
+            styled = top100.style.applymap(
+                lambda v: 'background-color: #add8e6' if isinstance(v, str) and '-' not in v else 
+                          'background-color: #f4cccc' if isinstance(v, str) and '-' in v else '',
+                subset=['증감']
+            )
             st.dataframe(styled)
 
         with tabs[4]:
             st.subheader("📊 연도-지역 누적 영역 그래프")
             pivot = df.pivot(index='연도', columns='영문지역', values='인구').fillna(0)
             pivot = pivot.drop(columns='National', errors='ignore')
-            fig, ax = plt.subplots(figsize=(10, 5))
-            pivot.plot.area(ax=ax)
-            ax.set_title("Population by Region")
+
+            pivot_melted = pivot.reset_index().melt(id_vars='연도', var_name='지역', value_name='인구')
+            fig, ax = plt.subplots(figsize=(12, 6))
+            sns.lineplot(data=pivot_melted, x='연도', y='인구', hue='지역', estimator=None, lw=2, ax=ax)
+            ax.set_title("Population by Region (Lineplot Approximation)")
             ax.set_xlabel("Year")
             ax.set_ylabel("Population")
+            ax.legend(loc='upper left', bbox_to_anchor=(1.01, 1), title="Region")
             st.pyplot(fig)
 
 
