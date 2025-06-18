@@ -212,6 +212,16 @@ class PopulationEDA:
         df.replace('-', 0, inplace=True)
         df[['인구', '출생아수(명)', '사망자수(명)']] = df[['인구', '출생아수(명)', '사망자수(명)']].apply(pd.to_numeric)
 
+        # 지역명 영어 변환 매핑
+        region_map = {
+            '서울': 'Seoul', '부산': 'Busan', '대구': 'Daegu', '인천': 'Incheon',
+            '광주': 'Gwangju', '대전': 'Daejeon', '울산': 'Ulsan', '세종': 'Sejong',
+            '경기': 'Gyeonggi', '강원': 'Gangwon', '충북': 'Chungbuk', '충남': 'Chungnam',
+            '전북': 'Jeonbuk', '전남': 'Jeonnam', '경북': 'Gyeongbuk', '경남': 'Gyeongnam',
+            '제주': 'Jeju', '전국': 'National'
+        }
+        df['영문지역'] = df['지역'].map(region_map)
+
         tabs = st.tabs(["기초 통계", "연도별 추이", "지역별 분석", "변화량 분석", "시각화"])
 
         with tabs[0]:
@@ -230,7 +240,6 @@ class PopulationEDA:
             plt.xlabel("Year")
             plt.ylabel("Population")
 
-            # 2035년 예측
             recent = national_df.tail(3)
             avg_delta = (recent['출생아수(명)'].mean() - recent['사망자수(명)'].mean())
             pred_2035 = national_df.iloc[-1]['인구'] + avg_delta * (2035 - national_df['연도'].max())
@@ -242,9 +251,9 @@ class PopulationEDA:
             st.subheader("📊 지역별 최근 5년 인구 변화량")
             latest_year = df['연도'].max()
             recent_5 = df[df['연도'].between(latest_year - 4, latest_year)]
-            pivot = recent_5.pivot(index='연도', columns='지역', values='인구')
+            pivot = recent_5.pivot(index='연도', columns='영문지역', values='인구')
             delta = pivot.loc[latest_year] - pivot.loc[latest_year - 4]
-            delta = delta.drop("전국").sort_values(ascending=False)
+            delta = delta.drop("National").sort_values(ascending=False)
 
             fig1, ax1 = plt.subplots()
             sns.barplot(x=delta.values / 1000, y=delta.index, ax=ax1)
@@ -253,7 +262,7 @@ class PopulationEDA:
             ax1.set_xlabel("Change (Thousands)")
             st.pyplot(fig1)
 
-            rate = (pivot.loc[latest_year] / pivot.loc[latest_year - 4] - 1).drop("전국") * 100
+            rate = (pivot.loc[latest_year] / pivot.loc[latest_year - 4] - 1).drop("National") * 100
             fig2, ax2 = plt.subplots()
             sns.barplot(x=rate.values, y=rate.index, ax=ax2)
             ax2.set_title("Population Growth Rate (%)")
@@ -270,15 +279,14 @@ class PopulationEDA:
 
         with tabs[4]:
             st.subheader("📊 연도-지역 누적 영역 그래프")
-            pivot = df.pivot(index='연도', columns='지역', values='인구').fillna(0)
-            pivot = pivot.drop(columns='전국', errors='ignore')
+            pivot = df.pivot(index='연도', columns='영문지역', values='인구').fillna(0)
+            pivot = pivot.drop(columns='National', errors='ignore')
             fig, ax = plt.subplots(figsize=(10, 5))
             pivot.plot.area(ax=ax)
             ax.set_title("Population by Region")
             ax.set_xlabel("Year")
             ax.set_ylabel("Population")
             st.pyplot(fig)
-
 
 
 # ---------------------
