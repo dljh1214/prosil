@@ -1,9 +1,5 @@
 streamlit
-pandas
-numpy
-matplotlib
-seaborn
 pyrebase4
 setuptools
-oauth2client
-pycryptodome
+matplotlib
+seaborn
