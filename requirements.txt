@@ -5,3 +5,5 @@ matplotlib
 seaborn
 pyrebase4
 setuptools
+oauth2client
+pycryptodome
