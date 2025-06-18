@@ -296,16 +296,17 @@ class PopulationEDA:
             pivot = df.pivot(index='연도', columns='영문지역', values='인구').fillna(0)
             pivot = pivot.drop(columns='National', errors='ignore')
 
-            pivot_melted = pivot.reset_index().melt(id_vars='연도', var_name='지역', value_name='인구')
+            sns.set_theme(style="whitegrid")
             fig, ax = plt.subplots(figsize=(12, 6))
-            sns.lineplot(data=pivot_melted, x='연도', y='인구', hue='지역', lw=2, ax=ax)
-            ax.fill_between(pivot_melted['연도'], 0, 0, color='white', alpha=0.0)  # area trigger
-            ax.set_title("Population by Region")
+            x = pivot.index.values
+            y = pivot.values.T  # shape: (지역 수, 연도 수)
+            labels = pivot.columns.tolist()
+            ax.stackplot(x, y, labels=labels, alpha=0.9)
+            ax.set_title("Population by Region (Stacked Area)")
             ax.set_xlabel("Year")
             ax.set_ylabel("Population")
             ax.legend(loc='upper left', bbox_to_anchor=(1.01, 1), title="Region")
             st.pyplot(fig)
-
 
 
 # ---------------------
